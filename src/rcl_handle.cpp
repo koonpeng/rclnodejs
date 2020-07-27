@@ -19,7 +19,7 @@
 
 namespace rclnodejs {
 
-Nan::Persistent<v8::Function> RclHandle::constructor;
+Nan::Persistent<v8::FunctionTemplate> RclHandle::constructor;
 
 RclHandle::RclHandle() : pointer_(nullptr), parent_(nullptr) {}
 
@@ -28,7 +28,8 @@ RclHandle::~RclHandle() {
 }
 
 void RclHandle::Init(v8::Local<v8::Object> exports) {
-  v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
+  constructor.Reset(Nan::New<v8::FunctionTemplate>(New));
+  auto tpl = constructor.Get(exports->GetIsolate());
   tpl->SetClassName(Nan::New("RclHandle").ToLocalChecked());
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
@@ -39,7 +40,6 @@ void RclHandle::Init(v8::Local<v8::Object> exports) {
 
   v8::Local<v8::Context> context = exports->GetIsolate()->GetCurrentContext();
 
-  constructor.Reset(tpl->GetFunction(context).ToLocalChecked());
   Nan::Set(exports, Nan::New("RclHandle").ToLocalChecked(),
            tpl->GetFunction(context).ToLocalChecked());
 }
@@ -89,9 +89,11 @@ v8::Local<v8::Object> RclHandle::NewInstance(void* handle, RclHandle* parent,
                                              std::function<int()> deleter) {
   Nan::EscapableHandleScope scope;
 
-  v8::Local<v8::Function> cons = Nan::New<v8::Function>(constructor);
-  v8::Local<v8::Context> context =
-      v8::Isolate::GetCurrent()->GetCurrentContext();
+  auto isolate = v8::Isolate::GetCurrent();
+  auto context = isolate->GetCurrentContext();
+  v8::Local<v8::Function> cons = constructor.Get(v8::Isolate::GetCurrent())
+                                     ->GetFunction(context)
+                                     .ToLocalChecked();
 
   v8::Local<v8::Object> instance =
       cons->NewInstance(context, 0, nullptr).ToLocalChecked();

@@ -33,7 +33,7 @@ bool IsRunningInElectronRenderer() {
   return process_type->StrictEquals(Nan::New("renderer").ToLocalChecked());
 }
 
-void InitModule(v8::Local<v8::Object> exports) {
+NODE_MODULE_INIT() {
   // workaround process name mangling by chromium
   //
   // rcl logging uses `program_invocation_name` to determine the log file,
@@ -47,8 +47,6 @@ void InitModule(v8::Local<v8::Object> exports) {
     assert(end);
     prog_name[end - prog_name] = 0;
   }
-
-  v8::Local<v8::Context> context = exports->GetIsolate()->GetCurrentContext();
 
   for (uint32_t i = 0; i < rclnodejs::binding_methods.size(); i++) {
     Nan::Set(
@@ -77,5 +75,3 @@ void InitModule(v8::Local<v8::Object> exports) {
   RCUTILS_UNUSED(result);
 #endif
 }
-
-NODE_MODULE(rclnodejs, InitModule);
