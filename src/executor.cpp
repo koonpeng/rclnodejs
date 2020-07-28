@@ -59,7 +59,7 @@ void Executor::Start(rcl_context_t* context, int32_t time_out) {
     context_ = context;
     time_out_ = time_out;
 
-    uv_async_init(uv_default_loop(), async_, DoWork);
+    uv_async_init(Nan::GetCurrentEventLoop(), async_, DoWork);
     async_->data = this;
 
     // Mark flag before creating thread
@@ -107,7 +107,7 @@ void Executor::Stop() {
                  delete async;
                  handle_closed = true;
                });
-      while (!handle_closed) uv_run(uv_default_loop(), UV_RUN_ONCE);
+      while (!handle_closed) uv_run(Nan::GetCurrentEventLoop(), UV_RUN_ONCE);
 
       RCLNODEJS_DEBUG("Background thread stopped.");
     }

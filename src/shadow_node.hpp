@@ -46,7 +46,6 @@ class ShadowNode : public Nan::ObjectWrap, public Executor::Delegate {
   ~ShadowNode();
 
   static void New(const Nan::FunctionCallbackInfo<v8::Value>& info);
-  static Nan::Persistent<v8::Function> constructor;
   static NAN_METHOD(Stop);
   static NAN_METHOD(Start);
   static NAN_METHOD(SyncHandles);

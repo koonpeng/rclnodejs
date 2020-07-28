@@ -23,8 +23,6 @@
 
 namespace rclnodejs {
 
-Nan::Persistent<v8::Function> ShadowNode::constructor;
-
 ShadowNode::ShadowNode() : handle_manager_(std::make_unique<HandleManager>()) {
   executor_ = std::make_unique<Executor>(handle_manager_.get(), this);
 }
@@ -50,7 +48,6 @@ void ShadowNode::Init(v8::Local<v8::Object> exports) {
 
   v8::Local<v8::Context> context = exports->GetIsolate()->GetCurrentContext();
 
-  constructor.Reset(tpl->GetFunction(context).ToLocalChecked());
   Nan::Set(exports, Nan::New("ShadowNode").ToLocalChecked(),
            tpl->GetFunction(context).ToLocalChecked());
 }
